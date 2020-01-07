@@ -1,6 +1,6 @@
 {
   "name": "threads-loader",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "threads worker loader module for webpack",
   "license": "MIT",
   "author": {
@@ -36,7 +36,8 @@
     "defaults": "webpack-defaults"
   },
   "files": [
-    "dist"
+    "dist",
+    "types"
   ],
   "peerDependencies": {
     "webpack": "^3.0.0 || ^4.0.0-alpha.0 || ^4.0.0"
