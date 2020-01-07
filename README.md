@@ -19,6 +19,19 @@ $ npm install threads-loader --save-dev
 ```js
 // App.js
 import Worker from 'threads-loader!./Worker.js';
+const worker = new Worker();
+```
+
+OR
+
+```js
+const worker = (() => {
+    if(typeof __webpack_require__ === 'function') {
+            return require('threads-loader!./Worker.js')();
+        }else{
+            return new Worker('./Worker.js');
+        }
+})();
 ```
 
 ### Config
@@ -46,9 +59,15 @@ import Worker from 'threads-loader!./Worker.js';
 
 ```js
 // App.js
-import { spawn } from 'threads';
-import worker from 'threads-loader!./test.js';
-const instance = await spawn(worker);
+import { spawn, Worker } from 'threads';
+import MyWorker from 'threads-loader!./Worker.js';
+const instance = await spawn((() => {
+                                 if(typeof __webpack_require__ === 'function') {
+                                         return new MyWorker();
+                                     }else{
+                                         return new Worker('./Worker.js');
+                                     }
+                             })());
 ...
 ```
 
@@ -99,14 +118,6 @@ declare module "threads-loader!*" {
   import WebpackThreadsWorker from 'threads-loader/types'
   export default WebpackThreadsWorker;
 }
-```
-
-```typescript
-// App.ts
-import { spawn } from 'threads';
-import worker from 'threads-loader!./test.js';
-const instance = await spawn(worker);
-...
 ```
 
 ## License
