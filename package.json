@@ -1,6 +1,6 @@
 {
   "name": "threads-loader",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "threads worker loader module for webpack",
   "license": "MIT",
   "author": {
