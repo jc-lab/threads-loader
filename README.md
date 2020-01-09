@@ -6,6 +6,8 @@ threads worker loader module for webpack
 
 This module requires a minimum of Node v6.9.0 and Webpack v4.0.0.
 
+** MUST USE THE [@jc-lab/threads](https://www.npmjs.com/package/@jc-lab/threads) PACKAGE**
+
 ## Getting Started
 
 To begin, you'll need to install `threads-loader`:
@@ -59,7 +61,7 @@ const worker = (() => {
 
 ```js
 // App.js
-import { spawn, Worker } from 'threads';
+import { spawn, Worker } from '@jc-lab/threads';
 import MyWorker from 'threads-loader!./Worker.js';
 const instance = await spawn((() => {
                                  if(typeof __webpack_require__ === 'function') {
@@ -106,6 +108,27 @@ the same public path used for other webpack assets is used.
   loader: 'threads-loader',
   options: { publicPath: '/scripts/workers/' }
 }
+```
+
+### inline
+
+Type: `boolean`
+Default: `false`
+
+You can also inline the worker as a BLOB with the inline parameter.
+
+(If you are in a node environment, the eval option of worker_threads is used)
+
+```js
+// webpack.config.js
+{
+  loader: 'threads-loader',
+  options: { inline: true }
+}
+```
+OR
+```js
+require('threads-loader?inline=true!./Worker.js');
 ```
 
 ### Integrating with TypeScript
