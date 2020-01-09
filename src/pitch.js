@@ -17,6 +17,7 @@ import WebWorkerTemplatePlugin from 'webpack/lib/webworker/WebWorkerTemplatePlug
 import FetchCompileWasmTemplatePlugin from 'webpack/lib/web/FetchCompileWasmTemplatePlugin';
 
 import { PLUGIN_INFO } from './consts';
+import WorkerLoaderError from './Error';
 
 export default function pitch(request) {
   const options = loaderUtils.getOptions(this) || {};
@@ -64,9 +65,9 @@ export default function pitch(request) {
   // Tapable.apply is deprecated in tapable@1.0.0-x.
   // The plugins should now call apply themselves.
   new WebWorkerTemplatePlugin(worker.options).apply(worker.compiler);
-  (new FetchCompileWasmTemplatePlugin({
-    mangleImports: compilerOptions.optimization.mangleWasmImports
-  })).apply(worker.compiler);
+  new FetchCompileWasmTemplatePlugin({
+    mangleImports: compilerOptions.optimization.mangleWasmImports,
+  }).apply(worker.compiler);
 
   if (this.target !== 'webworker' && this.target !== 'web') {
     new NodeTargetPlugin().apply(worker.compiler);
@@ -100,9 +101,28 @@ export default function pitch(request) {
     if (!err && compilation.errors && compilation.errors.length) {
       err = compilation.errors[0];
     }
+
     const entry = entries && entries[0] && entries[0].files[0];
     if (!err && !entry) err = Error(`WorkerPlugin: no entry for ${request}`);
-    if (err) return cb(err);
-    cb(null, `var worker = require('threads').Worker; module.exports = function() { return new worker(${publicPath} + ${JSON.stringify(entry)}); };`);
+    if (err) {
+      cb(err);
+      return;
+    }
+
+    if (options.inline) {
+      cb(
+        null,
+        `var worker = require('@jc-lab/threads').Worker; module.exports = function() { return worker.fromScript(${JSON.stringify(
+          compilation.assets[entry].source()
+        )}); };`
+      );
+    } else {
+      cb(
+        null,
+        `var worker = require('@jc-lab/threads').Worker; module.exports = function() { return new worker(${publicPath} + ${JSON.stringify(
+          entry
+        )}); };`
+      );
+    }
   });
 }

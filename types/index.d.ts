@@ -1,5 +1,5 @@
 declare module "threads-loader!*" {
-  import { Worker } from 'threads';
+  import { Worker } from '@jc-lab/threads';
 
   class WebpackThreadsWorker extends Worker {
     constructor();
